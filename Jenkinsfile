@@ -1,55 +1,26 @@
 pipeline {
-    agent { label 'JDK11'} 
+    agent  { label 'JDK11' }
     stages {
         stage('vcs') {
-            steps {    
-                git branch: "REL_INT_1.0", url: 'https://github.com/satishnamgadda/spring-petclinic.git'
+            steps {     
+                git branch: "REl_INT_1.0", url: 'https://github.com/satishnamgadda/spring-petclinic.git'
             }
 
         }
-        stage('artifactory configuaration') {
+        stage('build') {
             steps {
-                rtMavenDeployer (
-                   id : "mvn",
-                   releaseRepo : "spc-libs-release-local",
-                   snapshotRepo : "spc-libs-snapshot-local",
-                   serverId : "JFROG_SPC"
-                )
-
+                sh "mvn package"
             }
         }
-        stage('Exec Maven') {
+        stage('artifacts') {
             steps {
-                rtMavenRun(
-                    pom : "pom.xml",
-                    goals : "clean install",
-                    tool : "mvn",
-                    deployerId : "mvn"
-                )
-          
+            archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
             }
         }
-        stage('publish build info') {
-            steps {
-               rtPublishBuildInfo(
-                serverId : "JFROG_SPC"
-               )
+        stage('test results') {
+            steps {  
+                 junit 'target/surefire-reports/*.xml'
             }
         }
     }
-    
-}
-
-
-
-
- //    stage('Build the Code') {
- //           steps {
- //              withSonarQubeEnv('SONAR') {
- //                   sh script: 'mvn clean package sonar:sonar'
- //              }
- //           }
- //       }
- //     mail subject: 'build started',
- //                    body: 'build started',
- //                    to: 'qtdevops@gmail.com'
+}        
