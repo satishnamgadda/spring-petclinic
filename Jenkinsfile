@@ -10,7 +10,7 @@ pipeline {
         stage('artifactory configuaration') {
             steps {
                 rtMavenDeployer (
-                   id : "MAVEN_DEFAULT",
+                   id : "maven",
                    releaseRepo : "spc-libs-release-local",
                    snapshotRepo : "spc-libs-snapshot-local",
                    serverId : "JFROG_SPC"
@@ -24,7 +24,7 @@ pipeline {
                     pom : "pom.xml",
                     goals : "clean install",
                     tool : "maven",
-                    deployerId : "MAVEN_DEFAULT"
+                    deployerId : "maven"
                 )
           
             }
