@@ -14,10 +14,29 @@ pipeline {
                     pom : "pom.xml",
                     goals : "clean install",
                     tool : "mvn",
+                    deployerId : "mvn"
                     
                 )
           
             }
+        }
+        stage('artifactory configuaration') {
+             steps {
+                rtMavenDeployer(
+                   id : "mvn",
+                   releaseRepo : "spc10-libs-release-local",
+                   snapshotRepo : "spc10-libs-snapshot-local",
+                   serverId : "JFROG_SPC"
+                )
+
+           }
+        }
+         stage('publish build info') {
+             steps {
+               rtPublishBuildInfo(
+                serverId : "JFROG_SPC"
+              )
+           }
         }
       
     }
