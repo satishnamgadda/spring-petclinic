@@ -7,7 +7,17 @@ pipeline {
             }
 
         }
-      
+         stage('artifactory configuaration') {
+             steps {
+                rtMavenDeployer(
+                   id : "MAVEN_DEPLOYER",
+                   releaseRepo : "spc10-libs-release-local",
+                   snapshotRepo : "spc10-libs-snapshot-local",
+                   serverId : "JFROG-SPC"
+                )
+
+           }
+        }
         stage('Exec Maven') {
             steps {
                 rtMavenRun(
@@ -20,17 +30,7 @@ pipeline {
           
             }
         }
-        stage('artifactory configuaration') {
-             steps {
-                rtMavenDeployer(
-                   id : "MAVEN_DEPLOYER",
-                   releaseRepo : "spc10-libs-release-local",
-                   snapshotRepo : "spc10-libs-snapshot-local",
-                   serverId : "JFROG-SPC"
-                )
-
-           }
-        }
+     
          stage('publish build info') {
              steps {
                rtPublishBuildInfo(
