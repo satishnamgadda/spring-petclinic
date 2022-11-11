@@ -14,7 +14,7 @@ pipeline {
                     pom : "pom.xml",
                     goals : "install",
                     tool : "mvn",
-                    deployerId : "mvn"
+                    deployerId : "MAVEN_DEPLOYER_ID"
                     
                 )
           
