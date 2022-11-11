@@ -26,7 +26,7 @@ pipeline {
                    id : "mvn",
                    releaseRepo : "spc10-libs-release-local",
                    snapshotRepo : "spc10-libs-snapshot-local",
-                   serverId : "JFROG_SPC"
+                   serverId : "JFROG-SPC"
                 )
 
            }
@@ -34,7 +34,7 @@ pipeline {
          stage('publish build info') {
              steps {
                rtPublishBuildInfo(
-                serverId : "JFROG_SPC"
+                serverId : "JFROG-SPC"
               )
            }
         }
