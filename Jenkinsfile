@@ -19,13 +19,7 @@ pipeline {
           
             }
         }
-        stage('publish build info') {
-            steps {
-               rtPublishBuildInfo(
-                serverId : "JFROG_SPC"
-               )
-            }
-        }
+      
     }
     
 }
@@ -54,3 +48,10 @@ pipeline {
 //
  //           }
  //       }
+ //        stage('publish build info') {
+  //          steps {
+  //             rtPublishBuildInfo(
+  //              serverId : "JFROG_SPC"
+   //            )
+   //        }
+    //    }
