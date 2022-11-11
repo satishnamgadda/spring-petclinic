@@ -14,7 +14,7 @@ pipeline {
                     pom : "pom.xml",
                     goals : "clean install",
                     tool : "mvn",
-                    deployerId : "mvn"
+                    
                 )
           
             }
@@ -55,3 +55,4 @@ pipeline {
    //            )
    //        }
     //    }
+    //    deployerId : "mvn"
