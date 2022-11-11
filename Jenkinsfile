@@ -14,7 +14,7 @@ pipeline {
                     pom : "pom.xml",
                     goals : "clean install",
                     tool : "mvn",
-                    deployerId : "mvn"
+                    deployerId : "MAVEN_DEFAULT"
                     
                 )
           
@@ -23,7 +23,7 @@ pipeline {
         stage('artifactory configuaration') {
              steps {
                 rtMavenDeployer(
-                   id : "mvn",
+                   id : "MVN_DEFAULT",
                    releaseRepo : "spc10-libs-release-local",
                    snapshotRepo : "spc10-libs-snapshot-local",
                    serverId : "JFROG-SPC"
@@ -46,32 +46,3 @@ pipeline {
 
 
 
- //    stage('Build the Code') {
- //           steps {
- //              withSonarQubeEnv('SONAR') {
- //                   sh script: 'mvn clean package sonar:sonar'
- //              }
- //           }
- //       }
- //     mail subject: 'build started',
- //                    body: 'build started',
- //                    to: 'qtdevops@gmail.com'
- //      stage('artifactory configuaration') {
- //           steps {
-  //              rtMavenDeployer(
-   //                id : "mvn",
-  //                 releaseRepo : "spc-libs-release-local",
-  //                 snapshotRepo : "spc-libs-snapshot-local",
- //                  serverId : "JFROG_SPC"
- //               )
-//
- //           }
- //       }
- //        stage('publish build info') {
-  //          steps {
-  //             rtPublishBuildInfo(
-  //              serverId : "JFROG_SPC"
-   //            )
-   //        }
-    //    }
-    //    deployerId : "mvn"
