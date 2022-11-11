@@ -7,17 +7,7 @@ pipeline {
             }
 
         }
-        stage('artifactory configuaration') {
-            steps {
-                rtMavenDeployer(
-                   id : "mvn",
-                   releaseRepo : "spc-libs-release-local",
-                   snapshotRepo : "spc-libs-snapshot-local",
-                   serverId : "JFROG_SPC"
-                )
-
-            }
-        }
+      
         stage('Exec Maven') {
             steps {
                 rtMavenRun(
@@ -53,3 +43,14 @@ pipeline {
  //     mail subject: 'build started',
  //                    body: 'build started',
  //                    to: 'qtdevops@gmail.com'
+ //      stage('artifactory configuaration') {
+ //           steps {
+  //              rtMavenDeployer(
+   //                id : "mvn",
+  //                 releaseRepo : "spc-libs-release-local",
+  //                 snapshotRepo : "spc-libs-snapshot-local",
+ //                  serverId : "JFROG_SPC"
+ //               )
+//
+ //           }
+ //       }
