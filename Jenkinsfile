@@ -11,9 +11,9 @@ pipeline {
              steps {
                 rtMavenDeployer(
                    id : "MAVEN_DEPLOYER",
-                   releaseRepo : "spc-libs-release-local",
-                   snapshotRepo : "spc-libs-snapshot-local",
-                   serverId : "JFROG-SPC"
+                   releaseRepo : "libs-release-local",
+                   snapshotRepo : "libs-snapshot-local",
+                   serverId : "JFROG_ID"
                 )
 
            }
@@ -30,11 +30,18 @@ pipeline {
           
             }
         }
+        stage('Build the Code') {
+            steps {
+               withSonarQubeEnv('SONAR_SH') {
+                    sh script: 'mvn clean package sonar:sonar'
+               }
+            }
+        }
      
          stage('publish build info') {
              steps {
                rtPublishBuildInfo(
-                serverId : "JFROG-SPC"
+                serverId : "JFROG_ID"
               )
            }
         }
