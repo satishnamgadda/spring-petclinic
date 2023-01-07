@@ -1,8 +1,11 @@
 pipeline {
     agent { label 'JDK11'} 
     stages {
-        stage('vcs') {
-            steps {    
+        stage('checkout') {
+            steps { 
+                mail subject: 'build started',
+                     body: 'build started',
+                     to: 'qtdevops@gmail.com'   
                 git branch: "main", url: 'https://github.com/satishnamgadda/spring-petclinic.git'
             }
 
@@ -30,7 +33,7 @@ pipeline {
           
             }
         }
-        stage('Build the Code') {
+        stage('sonar scan') {
             steps {
                withSonarQubeEnv('SONAR_SH') {
                     sh script: 'mvn clean package sonar:sonar'
@@ -38,14 +41,27 @@ pipeline {
             }
         }
      
-         stage('publish build info') {
-             steps {
+        stage('publish build info') {
+            steps {
                rtPublishBuildInfo(
                 serverId : "JFROG_ID"
               )
            }
         }
+        stage('build the docker image') {
+            steps {
+                sh 'docker image build -t spc:1.8 .'
+                
+            }
+        }
+        stage('push the image') {
+            steps {
+                sh 'docker login -uharikasatish2019@gmail.com sonarnew.jfrog.io'
+                sh 'docker tag <IMAGE_ID> sonarnew.jfrog.io/spc-docker/<DOCKER_IMAGE>:<DOCKER_TAG>'
+            }
+        }
+        }
       
     }
     
-}
+
