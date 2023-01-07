@@ -17,3 +17,10 @@
 
                 }
             }
+     stage('jfrog') {
+            steps {
+                environment {
+                    AN_ACCESS_KEY = credentials('JFROG')
+                }
+            }
+        }        

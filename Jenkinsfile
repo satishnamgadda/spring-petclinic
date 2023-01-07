@@ -50,8 +50,8 @@ pipeline {
         }
         stage('build the docker image') {
             steps {
-                sh 'docker image build -t spc:1.8 .'
-                
+                sh 'docker image build -t sonarnew.jfrog.io/spc-docker/spc:1.8 .'
+
             }
         }
         stage('push the image') {
