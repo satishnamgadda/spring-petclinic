@@ -40,8 +40,8 @@ pipeline {
                }
             }
         }
-        // create webhooks: <jenkins_url:8080/sonarqube-webhook/>//
-        stage("Quality Gate") {
+        // create webhooks: <jenkins_url:8080/sonarqube-webhook/>
+        stage('Quality Gate') {
             steps {
               timeout(time: 20, unit: 'MINUTES') {
                 waitForQualityGate abortPipeline: true
