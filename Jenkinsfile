@@ -1,67 +1,80 @@
 pipeline {
-    agent { label 'JDK11'} 
-    stages {
-        stage('checkout') {
-            steps { 
-                mail subject: 'build started',
-                     body: 'build started',
-                     to: 'qtdevops@gmail.com'   
-                git branch: "main", url: 'https://github.com/satishnamgadda/spring-petclinic.git'
-            }
+    agent { label ('JDK11') }
+    parameters {
+        choice(name: "IMAGE_TYPE", choices: ['none','base_image','infra_image','test_image'], description: 'choose one')
 
-        }
-         stage('artifactory configuaration') {
-             steps {
-                rtMavenDeployer(
-                   id : "MAVEN_DEPLOYER",
-                   releaseRepo : "libs-release-local",
-                   snapshotRepo : "libs-snapshot-local",
-                   serverId : "JFROG_ID"
-                )
-
-           }
-        }
-        stage('Exec Maven') {
-            steps {
-                rtMavenRun(
-                    pom : "pom.xml",
-                    goals : "clean install",
-                    tool : "mvn",
-                    deployerId : "MAVEN_DEPLOYER"
-                    
-                )
-          
-            }
-        }
-        stage('sonar scan') {
-            steps {
-               withSonarQubeEnv('SONAR_SH') {
-                    sh script: 'mvn clean package sonar:sonar'
-               }
-            }
-        }
-     
-        stage('publish build info') {
-            steps {
-               rtPublishBuildInfo(
-                serverId : "JFROG_ID"
-              )
-           }
-        }
-        stage('build the docker image') {
-            steps {
-                sh 'docker image build -t sonarnew.jfrog.io/spc-docker/spc:1.8 .'
-
-            }
-        }
-        stage('push the image') {
-            steps {
-                sh 'docker login -uharikasatish2019@gmail.com sonarnew.jfrog.io'
-                sh 'docker tag <IMAGE_ID> sonarnew.jfrog.io/spc-docker/<DOCKER_IMAGE>:<DOCKER_TAG>'
-            }
-        }
-        }
-      
     }
+    stages {
+        stage('docker') {
+            environment {
+                def REG= "sonarnew.jfrog.io/spc-docker"
+                def IMAGE_NAME1= "nginx"
+                def IMAGE_NAME2= "alpine"
+                def IMAGE_NAME3= "httpd"
+            }
+            steps {
+                script {
+                    if (params['IMAGE_TYPE']=='base_image') {
+                        sh """
+                           docker image pull ${env.IMAGE_NAME1}
+                           docker image tag ${env.IMAGE_NAME1} ${env.REG}/${env.IMAGE_NAME1}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
+                           echo image tagging done for base image
+                           docker image ls
+                           """
+                    }
+                    else if (params['IMAGE_TYPE']=='infra_image') {
+                        sh """
+                           docker image pull ${env.IMAGE_NAME2}
+                           docker image tag ${env.IMAGE_NAME2} ${env.REG}/${env.IMAGE_NAME2}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
+                           echo image tagging done for infra image
+                           docker image ls
+                           """
+                    }
+                    else if (params['IMAGE_TYPE']=='test_image') {
+                        sh """
+                           docker image pull ${env.IMAGE_NAME3}
+                           docker image tag ${env.IMAGE_NAME3} ${env.REG}/${env.IMAGE_NAME3}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
+                           echo image tagging done for test image
+                           docker image ls
+                           """
+
+                    }
+                    else if (params['IMAGE_TYPE']=='none') {
+                        sh "echo image type is none"
+                    }
+                    else {
+                        sh " echo image tagging failed"
+                    }
+                    }
+                }
+            }
+                      
+            }
+        post {
+             always {
+            echo 'build completed'
+            mail to: 'qtdevops@gmail.com',
+                 subject: 'Job summary',
+                 body: """Build is completed for $env.BUILD_URL"""
+        }
+        failure{
+            echo 'build failed'
+            mail to: 'qtdevops@gmail.com',
+                 subject: 'Job summary',
+                 body: """Build is failed for $env.BUILD_NUMBER
+                          $env.BUILD_URL
+                          $env.BUILD_ID"""
+        }
+        success{
+            echo 'build is success'
+            mail to: 'qtdevops@gmail.com',
+                 subject: 'Job summary',
+                 body: """Build is successfully completed for $env.BUILD_NUMBER
+                          $env.BUILD_URL"""
+        }
+    }
+}
+                
     
 
+    
