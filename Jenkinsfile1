@@ -13,6 +13,7 @@
                         //reddy.jfrog.io/brep-dev/test:feature-lambda-test-8
                     }else {
                         echo "image not build"
+                        echo " yes"
                     }
 
                 }
