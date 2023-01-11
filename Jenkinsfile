@@ -47,7 +47,7 @@ pipeline {
                 waitForQualityGate abortPipeline: true
               }
             }
-     
+        }
         stage('publish build info') {
             steps {
                rtPublishBuildInfo(
@@ -78,5 +78,5 @@ pipeline {
         
         }
     }
-}  
+ 
 
