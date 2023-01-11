@@ -66,8 +66,12 @@ pipeline {
         }
         stage('push the image') {
             steps {
-                sh 'docker login -uharikasatish2019@gmail.com sonarnew.jfrog.io'
-                sh 'docker tag <IMAGE_ID> sonarnew.jfrog.io/spc-docker/<DOCKER_IMAGE>:<DOCKER_TAG>'
+                     withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
+                sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
+                sh 'docker image push sonarnew.jfrog.io/spc-docker/spc:1.9 '
+
+            }
+                
             }
         }
         

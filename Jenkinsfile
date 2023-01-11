@@ -20,6 +20,7 @@ pipeline {
                            docker image tag ${env.IMAGE_NAME1} ${env.REG}/${env.IMAGE_NAME1}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
                            echo image tagging done for base image
                            docker image ls
+                           docker image push ${env.IMAGE_NAME1} ${env.REG}/${env.IMAGE_NAME1}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
                            """
                     }
                     else if (params['IMAGE_TYPE']=='infra_image') {
