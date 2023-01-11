@@ -21,18 +21,18 @@ pipeline {
 
            }
         }
-        // stage('Exec Maven') {
-        //    steps {
-        //         rtMavenRun(
-        //             pom : "pom.xml",
-        //             goals : "clean install",
-        //             tool : "mvn",
-        //             deployerId : "MAVEN_DEPLOYER"
+        stage('Exec Maven') {
+           steps {
+                rtMavenRun(
+                    pom : "pom.xml",
+                    goals : "clean install",
+                    tool : "mvn",
+                    deployerId : "MAVEN_DEPLOYER"
                     
-        //         )
+                )
           
-        //     }
-        // }
+            }
+        }
         stage('sonar scan') {
             steps {
                withSonarQubeEnv('SONAR_SH') {
@@ -55,26 +55,26 @@ pipeline {
               )
            }
         }
-        stage('build the docker image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
-                sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
-                sh 'docker image build -t sonarnew.jfrog.io/spc-docker/spc:1.9 .'
+        // stage('build the docker image') {
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
+        //         sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
+        //         sh 'docker image build -t sonarnew.jfrog.io/spc-docker/spc:1.9 .'
                 
 
-            }
-        }
-        }
-        stage('push the image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
-                sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
-                sh 'docker image push sonarnew.jfrog.io/spc-docker/spc:1.9 '
+        //     }
+        //     }
+        // }
+        // stage('push the image') {
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
+        //         sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
+        //         sh 'docker image push sonarnew.jfrog.io/spc-docker/spc:1.9 '
 
-            }
+        //     }
                 
-            }
-        }
+        //     }
+        // }
         
         }
     }

@@ -1,0 +1,7 @@
+---
+- name: spc playbook
+  hosts: all
+  become: yes
+  tasks:
+    - name: update and install java11
+      
