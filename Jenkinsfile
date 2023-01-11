@@ -1,81 +1,82 @@
 pipeline {
-    agent { label ('JDK11') }
-    parameters {
-        choice(name: "IMAGE_TYPE", choices: ['none','base_image','infra_image','test_image'], description: 'choose one')
-
-    }
+    agent { label 'JDK11'} 
     stages {
-        stage('docker') {
-            environment {
-                def REG= "sonarnew.jfrog.io/spc-docker"
-                def IMAGE_NAME1= "nginx"
-                def IMAGE_NAME2= "alpine"
-                def IMAGE_NAME3= "httpd"
+        stage('checkout') {
+            steps { 
+                mail subject: 'build started',
+                     body: 'build started',
+                     to: 'qtdevops@gmail.com'   
+                git branch: "main", url: 'https://github.com/satishnamgadda/spring-petclinic.git'
             }
-            steps {
-                script {
-                    if (params['IMAGE_TYPE']=='base_image') {
-                        sh """
-                           docker image pull ${env.IMAGE_NAME1}
-                           docker image tag ${env.IMAGE_NAME1} ${env.REG}/${env.IMAGE_NAME1}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
-                           echo image tagging done for base image
-                           docker image ls
-                           docker image push  ${env.REG}/${env.IMAGE_NAME1}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
-                           """
-                    }
-                    else if (params['IMAGE_TYPE']=='infra_image') {
-                        sh """
-                           docker image pull ${env.IMAGE_NAME2}
-                           docker image tag ${env.IMAGE_NAME2} ${env.REG}/${env.IMAGE_NAME2}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
-                           echo image tagging done for infra image
-                           docker image ls
-                           """
-                    }
-                    else if (params['IMAGE_TYPE']=='test_image') {
-                        sh """
-                           docker image pull ${env.IMAGE_NAME3}
-                           docker image tag ${env.IMAGE_NAME3} ${env.REG}/${env.IMAGE_NAME3}:${params.IMAGE_TYPE}-${BUILD_NUMBER}
-                           echo image tagging done for test image
-                           docker image ls
-                           """
 
-                    }
-                    else if (params['IMAGE_TYPE']=='none') {
-                        sh "echo image type is none"
-                    }
-                    else {
-                        sh " echo image tagging failed"
-                    }
-                    }
-                }
-            }
-                      
-            }
-        post {
-             always {
-            echo 'build completed'
-            mail to: 'qtdevops@gmail.com',
-                 subject: 'Job summary',
-                 body: """Build is completed for $env.BUILD_URL"""
         }
-        failure{
-            echo 'build failed'
-            mail to: 'qtdevops@gmail.com',
-                 subject: 'Job summary',
-                 body: """Build is failed for $env.BUILD_NUMBER
-                          $env.BUILD_URL
-                          $env.BUILD_ID"""
+         stage('artifactory configuaration') {
+             steps {
+                rtMavenDeployer(
+                   id : "MAVEN_DEPLOYER",
+                   releaseRepo : "libs-release-local",
+                   snapshotRepo : "libs-snapshot-local",
+                   serverId : "JFROG_ID"
+                )
+
+           }
         }
-        success{
-            echo 'build is success'
-            mail to: 'qtdevops@gmail.com',
-                 subject: 'Job summary',
-                 body: """Build is successfully completed for $env.BUILD_NUMBER
-                          $env.BUILD_URL"""
+        // stage('Exec Maven') {
+        //    steps {
+        //         rtMavenRun(
+        //             pom : "pom.xml",
+        //             goals : "clean install",
+        //             tool : "mvn",
+        //             deployerId : "MAVEN_DEPLOYER"
+                    
+        //         )
+          
+        //     }
+        // }
+        stage('sonar scan') {
+            steps {
+               withSonarQubeEnv('SONAR_SH') {
+                    sh script: 'mvn clean package sonar:sonar'
+               }
+            }
+        }
+        // create webhooks: <jenkins_url:8080/sonarqube-webhook/>//
+        stage("Quality Gate") {
+            steps {
+              timeout(time: 20, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+              }
+            }
+     
+        stage('publish build info') {
+            steps {
+               rtPublishBuildInfo(
+                serverId : "JFROG_ID"
+              )
+           }
+        }
+        stage('build the docker image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
+                sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
+                sh 'docker image build -t sonarnew.jfrog.io/spc-docker/spc:1.9 .'
+                
+
+            }
+        }
+        }
+        stage('push the image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
+                sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
+                sh 'docker image push sonarnew.jfrog.io/spc-docker/spc:1.9 '
+
+            }
+                
+            }
+        }
+        
         }
     }
-}
-                
-    
+}  
 
-    
