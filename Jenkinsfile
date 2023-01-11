@@ -58,8 +58,8 @@ pipeline {
         stage('build the docker image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
-                sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
-                sh 'docker image build -t sonarnew.jfrog.io/spc-docker/spc:1.9 .'
+                sh "docker login spcnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
+                sh 'docker image build -t spcnew.jfrog.io/spc-docker/spc:1.9 .'
                 
 
             }
