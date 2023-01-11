@@ -4,4 +4,23 @@
   become: yes
   tasks:
     - name: update and install java11
+      ansible.builtin.apt :
+        name: openjdk-11-jdk
+        state: present
+        update_cache: yes
+    - name: download jar file
+      ansible.builtin.get_url:
+        url: 
+        dest: /home/devops
+        mode: '0777'
+    - name: copy service file
+      ansible.builtin.copy:
+        src: spc.service
+        dest: /etc/sysytemd/system/spc.service
+        mode: '0777'
+    - name: enable service file
+      ansible.builtin.systemd:
+        name: spc
+        state: started
+        enabled: yes            
       
