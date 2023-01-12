@@ -2,6 +2,8 @@
 - name: spc playbook
   hosts: all
   become: yes
+  vars:
+    passwd: AKCp8nys2UnSTqZk84yJZM5KwehdaTzDjqbBquS7gBc14g9vVKx5dBvRotXPBt1XSmwZeXJki
   tasks:
     - name: update and install java11
       ansible.builtin.apt :
@@ -10,13 +12,15 @@
         update_cache: yes
     - name: download jar file
       ansible.builtin.get_url:
-        url: 
+        username: namgaddasatish@gmail.com
+        password: "{{ passwd }}"
+        url: https://spcnew.jfrog.io/artifactory/default-libs-release-local/org/springframework/samples/spring-petclinic/2.7.3/spring-petclinic-2.7.3.jar
         dest: /home/devops
         mode: '0777'
     - name: copy service file
       ansible.builtin.copy:
         src: spc.service
-        dest: /etc/sysytemd/system/spc.service
+        dest: /etc/systemd/system/spc.service
         mode: '0777'
     - name: enable service file
       ansible.builtin.systemd:

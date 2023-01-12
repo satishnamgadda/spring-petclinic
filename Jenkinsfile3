@@ -1,0 +1,21 @@
+pipeline {
+    stages {
+        stage('vcs') {
+            agent { label 'ANS-M' }
+            steps {
+                git url: 'https://github.com/satishnamgadda/spring-petclinic.git',
+                    branch: 'main'
+            }
+        }
+        stage('ansible') {
+            agent { label 'ANS-M'}
+            steps {
+                sh """
+                ansible -i hosts -m ping all
+                ansible-playbook -i hosts spc-playbook.yaml 
+                """
+            }
+        }
+
+        }
+    }
