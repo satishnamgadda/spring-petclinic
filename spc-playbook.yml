@@ -3,7 +3,7 @@
   hosts: all
   become: yes
   vars:
-    passwd: AKCp8nys2UnSTqZk84yJZM5KwehdaTzDjqbBquS7gBc14g9vVKx5dBvRotXPBt1XSmwZeXJki
+    passwd: APIKEY
   tasks:
     - name: update and install java11
       ansible.builtin.apt :
