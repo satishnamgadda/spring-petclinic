@@ -65,16 +65,16 @@ pipeline {
             }
             }
         }
-        // stage('push the image') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
-        //         sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
-        //         sh 'docker image push sonarnew.jfrog.io/spc-docker/spc:1.9 '
+        stage('push the image') {
+            steps {
+               // withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
+              //  sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
+                sh 'docker image push sonarnew.jfrog.io/spc-docker/spc:1.9 '
 
-        //     }
+            //}
                 
-        //     }
-        // }
+            }
+        }
         
         }
     }
