@@ -12,7 +12,7 @@ pipeline {
             steps {
                 sh """
                 ansible -i hosts -m ping all
-                ansible-playbook -i hosts spc-playbook.yaml 
+                ansible-playbook -i hosts spc-playbook.yml 
                 """
             }
         }
