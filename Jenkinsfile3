@@ -1,5 +1,66 @@
 pipeline {
+    agent none
     stages {
+        stage('checkout') {
+            agent { label 'JDK-11' }
+            steps { 
+                mail subject: 'build started',
+                     body: 'build started',
+                     to: 'qtdevops@gmail.com'   
+                git branch: "main", url: 'https://github.com/satishnamgadda/spring-petclinic.git'
+            }
+
+        }
+         stage('artifactory configuaration') {
+             agent { label 'JDK-11' }
+             steps {
+                rtMavenDeployer(
+                   id : "MAVEN_DEPLOYER",
+                   releaseRepo : "default-libs-release",
+                   snapshotRepo : "default-libs-snapshot",
+                   serverId : "JFROG_ID"
+                )
+
+           }
+        }
+        stage('Exec Maven') {
+             agent { label 'JDK-11' }
+             steps {
+                rtMavenRun(
+                    pom : "pom.xml",
+                    goals : "clean install",
+                    tool : "mvn",
+                    deployerId : "MAVEN_DEPLOYER"
+                    
+                )
+          
+            }
+        }
+        stage('sonar scan') {
+             agent { label 'JDK-11' }
+             steps {
+               withSonarQubeEnv('SONAR_SH') {
+                    sh script: 'mvn clean package sonar:sonar'
+               }
+            }
+        }
+        // create webhooks: <jenkins_url:8080/sonarqube-webhook/>
+        stage('Quality Gate') {
+             agent { label 'JDK-11' }
+             steps {
+              timeout(time: 20, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+              }
+            }
+        }
+        stage('publish build info') {
+             agent { label 'JDK-11' }
+             steps {
+               rtPublishBuildInfo(
+                serverId : "JFROG_ID"
+              )
+           }
+        }
         stage('vcs') {
             agent { label 'ANS-M' }
             steps {
