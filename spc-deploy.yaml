@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: spc1
-          image: 
+          image: sonarnew.jfrog.io/spc-docker/spc:1.9
           ports:
             - containerPort: 8080
               protocol: TCP

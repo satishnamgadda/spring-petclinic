@@ -1,7 +1,8 @@
 pipeline {
-    agent { label 'JDK11'} 
+    agent none
     stages {
         stage('checkout') {
+            agent { label 'JDK11'} 
             steps { 
                 mail subject: 'build started',
                      body: 'build started',
@@ -11,6 +12,7 @@ pipeline {
 
         }
          stage('artifactory configuaration') {
+            agent { label 'JDK11'} 
              steps {
                 rtMavenDeployer(
                    id : "MAVEN_DEPLOYER",
@@ -22,6 +24,7 @@ pipeline {
            }
         }
         stage('Exec Maven') {
+            agent { label 'JDK11'} 
            steps {
                 rtMavenRun(
                     pom : "pom.xml",
@@ -34,6 +37,7 @@ pipeline {
             }
         }
         stage('sonar scan') {
+            agent { label 'JDK11'} 
             steps {
                withSonarQubeEnv('SONAR_SH') {
                     sh script: 'mvn clean package sonar:sonar'
@@ -42,6 +46,7 @@ pipeline {
         }
         // create webhooks: <jenkins_url:8080/sonarqube-webhook/>
         stage('Quality Gate') {
+            agent { label 'JDK11'} 
             steps {
               timeout(time: 20, unit: 'MINUTES') {
                 waitForQualityGate abortPipeline: true
@@ -49,6 +54,7 @@ pipeline {
             }
         }
         stage('publish build info') {
+            agent { label 'JDK11'} 
             steps {
                rtPublishBuildInfo(
                 serverId : "JFROG_ID"
@@ -56,6 +62,7 @@ pipeline {
            }
         }
         stage('build the docker image') {
+            agent { label 'JDK11'} 
             steps {
                 withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
                 sh "docker login spcnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
@@ -66,6 +73,7 @@ pipeline {
             }
         }
         stage('push the image') {
+            agent { label 'JDK11'} 
             steps {
                // withCredentials([usernamePassword(credentialsId: 'JFROG', passwordVariable: 'JFROG_PWD', usernameVariable: 'JFROG_NAME')]) {
               //  sh "docker login sonarnew.jfrog.io -u ${JFROG_NAME}  -p ${JFROG_PWD}"
@@ -73,6 +81,18 @@ pipeline {
                 sh 'docker pull sonarnew.jfrog.io/spc-docker/spc:1.9'
             //}
                 
+            }
+        }
+        stage('awseks') {
+            agent { label 'awseks' }
+            steps {
+                git url: 'https://github.com/satishnamgadda/learn-terraform-provision-eks-cluster.git',
+                    branch: 'main'
+                sh """
+                   terraform init
+                   terraform apply -auto-approve
+                   aws eks --region $(terraform output -raw region) update-kubeconfig  --name $(terraform output -raw cluster_name)
+                   """
             }
         }
         
