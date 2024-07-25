@@ -4,6 +4,10 @@ node {
             echo 'check out the code'
             checkout scm
         }
-    } catch (Exception e) {
-        currentBuild.result = 'FAILURE'
+    } 
+    catch (exc) {
+            echo 'Something failed, I should sound the klaxons!'
+            throw
+    }    
+        
 }
