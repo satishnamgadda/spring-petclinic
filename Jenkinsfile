@@ -16,7 +16,9 @@ node {
     stage('Branch') {
         try {
         sh 'git checkout main'
-        sh 'cat Jenkinsfile'
+    }
+    stage('build') {
+        sh 'mvn package'
     }
     catch (exc) {
             echo 'Something failed, I should sound the klaxons!'
