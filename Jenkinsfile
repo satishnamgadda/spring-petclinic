@@ -19,7 +19,7 @@ node {
         sh 'mvn package'
     }
     stage('update') {
-        sh '${WORKSPACE}/jenkins/pipeline/update-jenkins-plugins-ppln/update-plugins.sh'
+        sh 'sudo chown -R jenkins:jenkins /var/lib/jenkins'
     }
     stage('artifact') {
         sh '**/target/*.jar'
