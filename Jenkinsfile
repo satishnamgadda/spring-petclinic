@@ -12,8 +12,9 @@
         
 }*/
 node {
-    try {
+    
     stage('Branch') {
+        try {
         sh 'git checkout main'
     }
     catch (exc) {
