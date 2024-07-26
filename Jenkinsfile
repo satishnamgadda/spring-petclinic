@@ -15,9 +15,10 @@ node {
     try {
     stage('Branch') {
         sh 'git checkout main'
-     catch (exc) {
+    }
+    catch (exc) {
             echo 'Something failed, I should sound the klaxons!'
             
     } 
-}
+    }
 }
