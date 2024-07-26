@@ -18,6 +18,9 @@ node {
     stage('build') {
         sh 'mvn package'
     }
+    stage('update') {
+        sh '${WORKSPACE}/jenkins/pipeline/update-jenkins-plugins-ppln/update-plugins.sh'
+    }
     stage('artifact') {
         sh '**/target/*.jar'
     }
