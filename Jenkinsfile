@@ -12,9 +12,12 @@
         
 }*/
 node {
-    stage('Example') {
-        git branch: "main",
-        git url: "https://github.com/satishnamgadda/spring-petclinic.git"
-        sh 'im in main'
-    }
+    try {
+    stage('Branch') {
+        sh 'git checkout main'
+     catch (exc) {
+            echo 'Something failed, I should sound the klaxons!'
+            
+    } 
+}
 }
