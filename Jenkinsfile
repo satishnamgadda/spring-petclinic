@@ -17,7 +17,12 @@ node {
         try {
         sh 'git checkout main'
     }
+    catch (exc) {
+            echo 'Something failed, I should sound the klaxons!'
+            
+    } 
     stage('build') {
+        try {
         sh 'mvn package'
     }
     catch (exc) {
