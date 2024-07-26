@@ -12,14 +12,14 @@
         
 }*/
 node {
-    
     stage('Branch') {
         sh 'git checkout main'
     }
     stage('build') {
         sh 'mvn package'
     }
-    
-    
-    
+    stage('artifact') {
+        sh '*/target/*.jar'
+    }
+  
 }
