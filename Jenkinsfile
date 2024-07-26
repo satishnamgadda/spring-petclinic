@@ -12,17 +12,14 @@
         
 }*/
 node {
-    try {
+    
     stage('Branch') {
         sh 'git checkout main'
     }
     stage('build') {
         sh 'mvn package'
     }
-    }
-    catch (exc) {
-            echo 'Something failed, I should sound the klaxons!'
-            
-    } 
+    
+    
     
 }
