@@ -19,7 +19,7 @@ node {
         sh 'mvn package'
     }
     stage('artifact') {
-        sh '*/target/*.jar'
+        sh '**/target/*.jar'
     }
   
 }
